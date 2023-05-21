@@ -4,7 +4,8 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyPdcPPinsMnKdX03Kqf0Vyc",
+      "mount_file_id": "147q9AYrm_zb_su0oEU1Wm2EKZytfBXT3",
+      "authorship_tag": "ABX9TyO4nNJIn4KppSTl7VbsNiAe",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -37,7 +38,7 @@
     },
     {
       "cell_type": "code",
-      "execution_count": 67,
+      "execution_count": 18,
       "metadata": {
         "id": "BXje9iPpaWF2"
       },
@@ -67,7 +68,7 @@
       "metadata": {
         "id": "c5ZcWYkubnQD"
       },
-      "execution_count": 68,
+      "execution_count": null,
       "outputs": []
     },
     {
@@ -84,7 +85,7 @@
       "source": [
         "from google.colab import data_table\n",
         "data_table.enable_dataframe_formatter()\n",
-        "df = pd.read_csv('/content/drive/MyDrive/Data Science/MBA/TCC/Base/base.csv', sep = ';')\n",
+        "df = pd.read_csv('https://raw.githubusercontent.com/roliveira15/Data_Science_Sales_Forecast/main/base.csv', sep = ';')\n",
         "df.dtypes"
       ],
       "metadata": {
@@ -92,9 +93,9 @@
           "base_uri": "https://localhost:8080/"
         },
         "id": "jkotm9KXeRrh",
-        "outputId": "dc28381c-e506-417a-a611-aacc7c614f96"
+        "outputId": "18d46218-7c8c-41de-e745-46dfa9df414f"
       },
-      "execution_count": 97,
+      "execution_count": 83,
       "outputs": [
         {
           "output_type": "execute_result",
@@ -112,7 +113,7 @@
             ]
           },
           "metadata": {},
-          "execution_count": 97
+          "execution_count": 83
         }
       ]
     },
@@ -137,47 +138,535 @@
       "source": [
         "df['peso'] = df['peso'].str.replace(',','.').astype(float)\n",
         "df['valor_total_pedido'] = df['valor_total_pedido'].str.replace(',','.').astype(float)\n",
+        "df['data'] = pd.to_datetime(df['data'])\n",
         "\n",
-        "df.dtypes\n",
-        "\n"
+        "df.dtypes"
       ],
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/"
         },
         "id": "B-FtmkB2g8pY",
-        "outputId": "cba72d3d-0adc-42e6-aefa-34b60d33616d"
+        "outputId": "71ee4785-8d90-484a-94df-32aba12ec518"
       },
-      "execution_count": 98,
+      "execution_count": 84,
       "outputs": [
         {
           "output_type": "execute_result",
           "data": {
             "text/plain": [
-              "tipo_frete                       object\n",
-              "peso                            float64\n",
-              "valor_total_pedido              float64\n",
-              "data                             object\n",
-              "abreviatura_uf                   object\n",
-              "regiao                           object\n",
-              "grupo_gerencial_produto          object\n",
-              "conta_numero_pedido_vendedor      int64\n",
+              "tipo_frete                              object\n",
+              "peso                                   float64\n",
+              "valor_total_pedido                     float64\n",
+              "data                            datetime64[ns]\n",
+              "abreviatura_uf                          object\n",
+              "regiao                                  object\n",
+              "grupo_gerencial_produto                 object\n",
+              "conta_numero_pedido_vendedor             int64\n",
               "dtype: object"
             ]
           },
           "metadata": {},
-          "execution_count": 98
+          "execution_count": 84
         }
       ]
     },
     {
       "cell_type": "markdown",
       "source": [
-        "Separando todos os tipos de estruturas que faremos a análise "
+        "Criar uma coluna de Ano e mês"
+      ],
+      "metadata": {
+        "id": "Q4lhJ7LA6Blh"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['ano'] = df['data'].dt.year\n",
+        "df['mes'] = df['data'].dt.month\n",
+        "\n",
+        "df.dtypes"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "bvqCSZ-X6Dti",
+        "outputId": "b5c7b6c2-db18-40ff-8269-cf1dd685052e"
+      },
+      "execution_count": 85,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "tipo_frete                              object\n",
+              "peso                                   float64\n",
+              "valor_total_pedido                     float64\n",
+              "data                            datetime64[ns]\n",
+              "abreviatura_uf                          object\n",
+              "regiao                                  object\n",
+              "grupo_gerencial_produto                 object\n",
+              "conta_numero_pedido_vendedor             int64\n",
+              "ano                                      int64\n",
+              "mes                                      int64\n",
+              "dtype: object"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 85
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Analisando os tipos de estruturas"
       ],
       "metadata": {
         "id": "FLRD4Fokl3GQ"
       }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "groupStructures = df.groupby(['grupo_gerencial_produto']).sum()\n",
+        "\n",
+        "groupStructures\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 635
+        },
+        "id": "9tyJTQRC3hg8",
+        "outputId": "50a4d28b-8a3f-4c6f-f002-756c0d655021"
+      },
+      "execution_count": 90,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "<ipython-input-90-749432ae73fa>:1: FutureWarning: The default value of numeric_only in DataFrameGroupBy.sum is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.\n",
+            "  groupStructures = df.groupby(['grupo_gerencial_produto']).sum()\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "                                 peso  valor_total_pedido  \\\n",
+              "grupo_gerencial_produto                                     \n",
+              "AUTOMACAO                7.234556e+04        2.024291e+07   \n",
+              "AUTOPORTANTE             9.011727e+05        1.457065e+07   \n",
+              "BASES MOVEIS             3.420426e+04        2.192774e+06   \n",
+              "BOBINAS                  0.000000e+00        1.008868e+04   \n",
+              "CANTILEVER               2.623674e+05        2.747924e+06   \n",
+              "CARRO SATELITE           2.168491e+06        2.652515e+07   \n",
+              "DINAMICO                 1.284057e+07        3.743661e+07   \n",
+              "DRIVE IN                 1.734450e+07        1.936832e+08   \n",
+              "DRIVE THROUG             4.554784e+05        3.595071e+06   \n",
+              "FLOW RACK                8.149926e+05        1.973782e+07   \n",
+              "MEZANINO                 4.457656e+05        1.227336e+07   \n",
+              "NÃO INFORMADO            2.757667e+06        4.145880e+06   \n",
+              "OUTROS                   2.478783e+07        1.106213e+07   \n",
+              "PASSARELA                1.971004e+06        3.304006e+07   \n",
+              "PORTA BOBINA             2.805060e+04        5.469609e+05   \n",
+              "PORTA PALLET             9.303095e+07        7.248872e+08   \n",
+              "PUSH BACK                1.916192e+07        2.386305e+07   \n",
+              "SERVICOS                 0.000000e+00        3.170729e+07   \n",
+              "TRANS NAO MOTOR          0.000000e+00        3.200000e+05   \n",
+              "TRANSELEVADORES          5.813829e+06        1.037825e+08   \n",
+              "TUBOS                    2.695000e+03        1.375259e+04   \n",
+              "UNIVERSAL                8.911313e+05        6.331061e+06   \n",
+              "\n",
+              "                         conta_numero_pedido_vendedor      ano    mes  \n",
+              "grupo_gerencial_produto                                                \n",
+              "AUTOMACAO                                          33    64691    186  \n",
+              "AUTOPORTANTE                                       25    50522    184  \n",
+              "BASES MOVEIS                                        3     6067      7  \n",
+              "BOBINAS                                             1     2020      6  \n",
+              "CANTILEVER                                         26    48507    172  \n",
+              "CARRO SATELITE                                     27    52552    134  \n",
+              "DINAMICO                                          132   246605    830  \n",
+              "DRIVE IN                                          434   820606   2659  \n",
+              "DRIVE THROUG                                       10    20210     47  \n",
+              "FLOW RACK                                          77   149596    446  \n",
+              "MEZANINO                                           31    60631    172  \n",
+              "NÃO INFORMADO                                      62   121203    324  \n",
+              "OUTROS                                            368   743976   2460  \n",
+              "PASSARELA                                          63   127328    410  \n",
+              "PORTA BOBINA                                       12    24247     66  \n",
+              "PORTA PALLET                                     3395  4873199  15844  \n",
+              "PUSH BACK                                          54   105106    347  \n",
+              "SERVICOS                                          657  1202890   3993  \n",
+              "TRANS NAO MOTOR                                     1     2020      2  \n",
+              "TRANSELEVADORES                                     8    16176     53  \n",
+              "TUBOS                                               1     2020      1  \n",
+              "UNIVERSAL                                         243   491008   1341  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-b27dde10-f457-4dd4-b2a4-ca01a4121f94\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>peso</th>\n",
+              "      <th>valor_total_pedido</th>\n",
+              "      <th>conta_numero_pedido_vendedor</th>\n",
+              "      <th>ano</th>\n",
+              "      <th>mes</th>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>grupo_gerencial_produto</th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "      <th></th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>AUTOMACAO</th>\n",
+              "      <td>7.234556e+04</td>\n",
+              "      <td>2.024291e+07</td>\n",
+              "      <td>33</td>\n",
+              "      <td>64691</td>\n",
+              "      <td>186</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>AUTOPORTANTE</th>\n",
+              "      <td>9.011727e+05</td>\n",
+              "      <td>1.457065e+07</td>\n",
+              "      <td>25</td>\n",
+              "      <td>50522</td>\n",
+              "      <td>184</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>BASES MOVEIS</th>\n",
+              "      <td>3.420426e+04</td>\n",
+              "      <td>2.192774e+06</td>\n",
+              "      <td>3</td>\n",
+              "      <td>6067</td>\n",
+              "      <td>7</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>BOBINAS</th>\n",
+              "      <td>0.000000e+00</td>\n",
+              "      <td>1.008868e+04</td>\n",
+              "      <td>1</td>\n",
+              "      <td>2020</td>\n",
+              "      <td>6</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>CANTILEVER</th>\n",
+              "      <td>2.623674e+05</td>\n",
+              "      <td>2.747924e+06</td>\n",
+              "      <td>26</td>\n",
+              "      <td>48507</td>\n",
+              "      <td>172</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>CARRO SATELITE</th>\n",
+              "      <td>2.168491e+06</td>\n",
+              "      <td>2.652515e+07</td>\n",
+              "      <td>27</td>\n",
+              "      <td>52552</td>\n",
+              "      <td>134</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>DINAMICO</th>\n",
+              "      <td>1.284057e+07</td>\n",
+              "      <td>3.743661e+07</td>\n",
+              "      <td>132</td>\n",
+              "      <td>246605</td>\n",
+              "      <td>830</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>DRIVE IN</th>\n",
+              "      <td>1.734450e+07</td>\n",
+              "      <td>1.936832e+08</td>\n",
+              "      <td>434</td>\n",
+              "      <td>820606</td>\n",
+              "      <td>2659</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>DRIVE THROUG</th>\n",
+              "      <td>4.554784e+05</td>\n",
+              "      <td>3.595071e+06</td>\n",
+              "      <td>10</td>\n",
+              "      <td>20210</td>\n",
+              "      <td>47</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>FLOW RACK</th>\n",
+              "      <td>8.149926e+05</td>\n",
+              "      <td>1.973782e+07</td>\n",
+              "      <td>77</td>\n",
+              "      <td>149596</td>\n",
+              "      <td>446</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>MEZANINO</th>\n",
+              "      <td>4.457656e+05</td>\n",
+              "      <td>1.227336e+07</td>\n",
+              "      <td>31</td>\n",
+              "      <td>60631</td>\n",
+              "      <td>172</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>NÃO INFORMADO</th>\n",
+              "      <td>2.757667e+06</td>\n",
+              "      <td>4.145880e+06</td>\n",
+              "      <td>62</td>\n",
+              "      <td>121203</td>\n",
+              "      <td>324</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>OUTROS</th>\n",
+              "      <td>2.478783e+07</td>\n",
+              "      <td>1.106213e+07</td>\n",
+              "      <td>368</td>\n",
+              "      <td>743976</td>\n",
+              "      <td>2460</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>PASSARELA</th>\n",
+              "      <td>1.971004e+06</td>\n",
+              "      <td>3.304006e+07</td>\n",
+              "      <td>63</td>\n",
+              "      <td>127328</td>\n",
+              "      <td>410</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>PORTA BOBINA</th>\n",
+              "      <td>2.805060e+04</td>\n",
+              "      <td>5.469609e+05</td>\n",
+              "      <td>12</td>\n",
+              "      <td>24247</td>\n",
+              "      <td>66</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>PORTA PALLET</th>\n",
+              "      <td>9.303095e+07</td>\n",
+              "      <td>7.248872e+08</td>\n",
+              "      <td>3395</td>\n",
+              "      <td>4873199</td>\n",
+              "      <td>15844</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>PUSH BACK</th>\n",
+              "      <td>1.916192e+07</td>\n",
+              "      <td>2.386305e+07</td>\n",
+              "      <td>54</td>\n",
+              "      <td>105106</td>\n",
+              "      <td>347</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>SERVICOS</th>\n",
+              "      <td>0.000000e+00</td>\n",
+              "      <td>3.170729e+07</td>\n",
+              "      <td>657</td>\n",
+              "      <td>1202890</td>\n",
+              "      <td>3993</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>TRANS NAO MOTOR</th>\n",
+              "      <td>0.000000e+00</td>\n",
+              "      <td>3.200000e+05</td>\n",
+              "      <td>1</td>\n",
+              "      <td>2020</td>\n",
+              "      <td>2</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>TRANSELEVADORES</th>\n",
+              "      <td>5.813829e+06</td>\n",
+              "      <td>1.037825e+08</td>\n",
+              "      <td>8</td>\n",
+              "      <td>16176</td>\n",
+              "      <td>53</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>TUBOS</th>\n",
+              "      <td>2.695000e+03</td>\n",
+              "      <td>1.375259e+04</td>\n",
+              "      <td>1</td>\n",
+              "      <td>2020</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>UNIVERSAL</th>\n",
+              "      <td>8.911313e+05</td>\n",
+              "      <td>6.331061e+06</td>\n",
+              "      <td>243</td>\n",
+              "      <td>491008</td>\n",
+              "      <td>1341</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-b27dde10-f457-4dd4-b2a4-ca01a4121f94')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-b27dde10-f457-4dd4-b2a4-ca01a4121f94 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-b27dde10-f457-4dd4-b2a4-ca01a4121f94');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ],
+            "application/vnd.google.colaboratory.module+javascript": "\n      import \"https://ssl.gstatic.com/colaboratory/data_table/99dac6621f6ae8c4/data_table.js\";\n\n      window.createDataTable({\n        data: [[\"AUTOMACAO\",\n{\n            'v': 72345.5641,\n            'f': \"72345.5641\",\n        },\n{\n            'v': 20242914.32,\n            'f': \"20242914.32\",\n        },\n{\n            'v': 33,\n            'f': \"33\",\n        },\n{\n            'v': 64691,\n            'f': \"64691\",\n        },\n{\n            'v': 186,\n            'f': \"186\",\n        }],\n [\"AUTOPORTANTE\",\n{\n            'v': 901172.68646,\n            'f': \"901172.68646\",\n        },\n{\n            'v': 14570651.57,\n            'f': \"14570651.57\",\n        },\n{\n            'v': 25,\n            'f': \"25\",\n        },\n{\n            'v': 50522,\n            'f': \"50522\",\n        },\n{\n            'v': 184,\n            'f': \"184\",\n        }],\n [\"BASES MOVEIS\",\n{\n            'v': 34204.261,\n            'f': \"34204.261\",\n        },\n{\n            'v': 2192774.0,\n            'f': \"2192774.0\",\n        },\n{\n            'v': 3,\n            'f': \"3\",\n        },\n{\n            'v': 6067,\n            'f': \"6067\",\n        },\n{\n            'v': 7,\n            'f': \"7\",\n        }],\n [\"BOBINAS\",\n{\n            'v': 0.0,\n            'f': \"0.0\",\n        },\n{\n            'v': 10088.68,\n            'f': \"10088.68\",\n        },\n{\n            'v': 1,\n            'f': \"1\",\n        },\n{\n            'v': 2020,\n            'f': \"2020\",\n        },\n{\n            'v': 6,\n            'f': \"6\",\n        }],\n [\"CANTILEVER\",\n{\n            'v': 262367.43710000004,\n            'f': \"262367.43710000004\",\n        },\n{\n            'v': 2747924.38,\n            'f': \"2747924.38\",\n        },\n{\n            'v': 26,\n            'f': \"26\",\n        },\n{\n            'v': 48507,\n            'f': \"48507\",\n        },\n{\n            'v': 172,\n            'f': \"172\",\n        }],\n [\"CARRO SATELITE\",\n{\n            'v': 2168490.7395,\n            'f': \"2168490.7395\",\n        },\n{\n            'v': 26525153.41,\n            'f': \"26525153.41\",\n        },\n{\n            'v': 27,\n            'f': \"27\",\n        },\n{\n            'v': 52552,\n            'f': \"52552\",\n        },\n{\n            'v': 134,\n            'f': \"134\",\n        }],\n [\"DINAMICO\",\n{\n            'v': 12840568.83256,\n            'f': \"12840568.83256\",\n        },\n{\n            'v': 37436606.17,\n            'f': \"37436606.17\",\n        },\n{\n            'v': 132,\n            'f': \"132\",\n        },\n{\n            'v': 246605,\n            'f': \"246605\",\n        },\n{\n            'v': 830,\n            'f': \"830\",\n        }],\n [\"DRIVE IN\",\n{\n            'v': 17344498.37396,\n            'f': \"17344498.37396\",\n        },\n{\n            'v': 193683233.8,\n            'f': \"193683233.8\",\n        },\n{\n            'v': 434,\n            'f': \"434\",\n        },\n{\n            'v': 820606,\n            'f': \"820606\",\n        },\n{\n            'v': 2659,\n            'f': \"2659\",\n        }],\n [\"DRIVE THROUG\",\n{\n            'v': 455478.3544,\n            'f': \"455478.3544\",\n        },\n{\n            'v': 3595070.52,\n            'f': \"3595070.52\",\n        },\n{\n            'v': 10,\n            'f': \"10\",\n        },\n{\n            'v': 20210,\n            'f': \"20210\",\n        },\n{\n            'v': 47,\n            'f': \"47\",\n        }],\n [\"FLOW RACK\",\n{\n            'v': 814992.5544,\n            'f': \"814992.5544\",\n        },\n{\n            'v': 19737823.44,\n            'f': \"19737823.44\",\n        },\n{\n            'v': 77,\n            'f': \"77\",\n        },\n{\n            'v': 149596,\n            'f': \"149596\",\n        },\n{\n            'v': 446,\n            'f': \"446\",\n        }],\n [\"MEZANINO\",\n{\n            'v': 445765.56130999996,\n            'f': \"445765.56130999996\",\n        },\n{\n            'v': 12273355.99,\n            'f': \"12273355.99\",\n        },\n{\n            'v': 31,\n            'f': \"31\",\n        },\n{\n            'v': 60631,\n            'f': \"60631\",\n        },\n{\n            'v': 172,\n            'f': \"172\",\n        }],\n [\"N\\u00c3O INFORMADO\",\n{\n            'v': 2757667.10606,\n            'f': \"2757667.10606\",\n        },\n{\n            'v': 4145879.5300000003,\n            'f': \"4145879.5300000003\",\n        },\n{\n            'v': 62,\n            'f': \"62\",\n        },\n{\n            'v': 121203,\n            'f': \"121203\",\n        },\n{\n            'v': 324,\n            'f': \"324\",\n        }],\n [\"OUTROS\",\n{\n            'v': 24787826.47,\n            'f': \"24787826.47\",\n        },\n{\n            'v': 11062129.03,\n            'f': \"11062129.03\",\n        },\n{\n            'v': 368,\n            'f': \"368\",\n        },\n{\n            'v': 743976,\n            'f': \"743976\",\n        },\n{\n            'v': 2460,\n            'f': \"2460\",\n        }],\n [\"PASSARELA\",\n{\n            'v': 1971003.9312,\n            'f': \"1971003.9312\",\n        },\n{\n            'v': 33040058.11,\n            'f': \"33040058.11\",\n        },\n{\n            'v': 63,\n            'f': \"63\",\n        },\n{\n            'v': 127328,\n            'f': \"127328\",\n        },\n{\n            'v': 410,\n            'f': \"410\",\n        }],\n [\"PORTA BOBINA\",\n{\n            'v': 28050.60116,\n            'f': \"28050.60116\",\n        },\n{\n            'v': 546960.9299999999,\n            'f': \"546960.9299999999\",\n        },\n{\n            'v': 12,\n            'f': \"12\",\n        },\n{\n            'v': 24247,\n            'f': \"24247\",\n        },\n{\n            'v': 66,\n            'f': \"66\",\n        }],\n [\"PORTA PALLET\",\n{\n            'v': 93030950.59897,\n            'f': \"93030950.59897\",\n        },\n{\n            'v': 724887238.89,\n            'f': \"724887238.89\",\n        },\n{\n            'v': 3395,\n            'f': \"3395\",\n        },\n{\n            'v': 4873199,\n            'f': \"4873199\",\n        },\n{\n            'v': 15844,\n            'f': \"15844\",\n        }],\n [\"PUSH BACK\",\n{\n            'v': 19161921.31386,\n            'f': \"19161921.31386\",\n        },\n{\n            'v': 23863053.38,\n            'f': \"23863053.38\",\n        },\n{\n            'v': 54,\n            'f': \"54\",\n        },\n{\n            'v': 105106,\n            'f': \"105106\",\n        },\n{\n            'v': 347,\n            'f': \"347\",\n        }],\n [\"SERVICOS\",\n{\n            'v': 0.0,\n            'f': \"0.0\",\n        },\n{\n            'v': 31707292.150000002,\n            'f': \"31707292.150000002\",\n        },\n{\n            'v': 657,\n            'f': \"657\",\n        },\n{\n            'v': 1202890,\n            'f': \"1202890\",\n        },\n{\n            'v': 3993,\n            'f': \"3993\",\n        }],\n [\"TRANS NAO MOTOR\",\n{\n            'v': 0.0,\n            'f': \"0.0\",\n        },\n{\n            'v': 320000.0,\n            'f': \"320000.0\",\n        },\n{\n            'v': 1,\n            'f': \"1\",\n        },\n{\n            'v': 2020,\n            'f': \"2020\",\n        },\n{\n            'v': 2,\n            'f': \"2\",\n        }],\n [\"TRANSELEVADORES\",\n{\n            'v': 5813829.2405,\n            'f': \"5813829.2405\",\n        },\n{\n            'v': 103782482.44,\n            'f': \"103782482.44\",\n        },\n{\n            'v': 8,\n            'f': \"8\",\n        },\n{\n            'v': 16176,\n            'f': \"16176\",\n        },\n{\n            'v': 53,\n            'f': \"53\",\n        }],\n [\"TUBOS\",\n{\n            'v': 2695.0,\n            'f': \"2695.0\",\n        },\n{\n            'v': 13752.59,\n            'f': \"13752.59\",\n        },\n{\n            'v': 1,\n            'f': \"1\",\n        },\n{\n            'v': 2020,\n            'f': \"2020\",\n        },\n{\n            'v': 1,\n            'f': \"1\",\n        }],\n [\"UNIVERSAL\",\n{\n            'v': 891131.344,\n            'f': \"891131.344\",\n        },\n{\n            'v': 6331061.13,\n            'f': \"6331061.13\",\n        },\n{\n            'v': 243,\n            'f': \"243\",\n        },\n{\n            'v': 491008,\n            'f': \"491008\",\n        },\n{\n            'v': 1341,\n            'f': \"1341\",\n        }]],\n        columns: [[\"string\", \"grupo_gerencial_produto\"], [\"number\", \"peso\"], [\"number\", \"valor_total_pedido\"], [\"number\", \"conta_numero_pedido_vendedor\"], [\"number\", \"ano\"], [\"number\", \"mes\"]],\n        columnOptions: [{\"width\": \"1px\", \"className\": \"index_column\"}],\n        rowsPerPage: 25,\n        helpUrl: \"https://colab.research.google.com/notebooks/data_table.ipynb\",\n        suppressOutputScrolling: true,\n        minimumWidth: undefined,\n      });\n    "
+          },
+          "metadata": {},
+          "execution_count": 90
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Separando por tipo de estrutura"
+      ],
+      "metadata": {
+        "id": "g231cE95FpDM"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#type(groupStructures)\n",
+        "#df.groupStructures\n",
+        "structures = groupStructures['grupo_gerencial_produto'].tolist()\n",
+        "\n",
+        "#gfg\n",
+        "'''\n",
+        "\n",
+        "for i in range(len(groupStructures)):\n",
+        "  arrayProduct.extend([i]) == groupStructures[i]\n",
+        "  groupStructures \n",
+        "  df.query(\"`Courses Fee` >= 23000 and `Courses Fee` <= 24000\")\n",
+        "  i=i+1\n",
+        "  print(i)\n",
+        "'''"
+      ],
+      "metadata": {
+        "id": "Cgl5OR6iFsrZ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Realizar a plotagem de todos os grupos para entender o comportadomento dos gráficos"
+      ],
+      "metadata": {
+        "id": "UxaOMTcJ5SJS"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#groupStructures.plot.area();\n",
+        "\n",
+        "filterPP = df.query(\"grupo_gerencial_produto = PORTA PALLETE and `Courses Fee` <= 24000\")\n",
+        "\n",
+        "\n",
+        "groupStructures.figure();\n",
+        "\n",
+        "ts.plot(style=\"k--\", label=\"Series\");"
+      ],
+      "metadata": {
+        "id": "WVLms6o871oi"
+      },
+      "execution_count": null,
+      "outputs": []
     }
   ]
 }
